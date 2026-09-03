@@ -47,3 +47,19 @@ export const DEMO_SCORECARD = {
   },
   data_quality: { record_count: 1286, average_confidence: 82.4, estimated_share_pct: 17.8 },
 }
+
+export const DEMO_CHART_DATA = [
+  { label: 'Jan', value: 42 },
+  { label: 'Feb', value: 48 },
+  { label: 'Mar', value: 45 },
+  { label: 'Apr', value: 53 },
+  { label: 'May', value: 49 },
+  { label: 'Jun', value: 57 },
+]
+
+export const DEMO_TREND = [
+  { x: 2022, y: 231400 },
+  { x: 2023, y: 215900 },
+  { x: 2024, y: 201100 },
+  { x: 2025, y: 184260 },
+]

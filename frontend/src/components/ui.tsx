@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { api, fmt, useApi } from '../lib/api'
+import { DEMO_CHART_DATA, DEMO_TREND } from '../lib/demo'
 
 export function Page({ title, sub, req, actions, children }: any) {
   return (
@@ -31,7 +32,7 @@ export function ErrorBox({ error }: { error: string }) {
 export function Data({ of, children }: { of: any; children: (d: any) => React.ReactNode }) {
   if (of.loading) return <Loading />
   if (of.error) return <ErrorBox error={of.error} />
-  if (!of.data) return <div className="muted small">No data.</div>
+  if (!of.data) return <div className="demo-empty">Representative demo data is unavailable for this view.</div>
   return <>{children(of.data)}</>
 }
 
@@ -337,14 +338,14 @@ function LineageBody({ d }: { d: any }) {
 
 /** Lightweight inline SVG charts — no external chart dependency. */
 export function BarChart({ data, x, y, color = 'var(--accent-2)', height = 200, format }: any) {
-  if (!data?.length) return <div className="muted small">No data.</div>
-  const max = Math.max(...data.map((d: any) => Number(d[y]) || 0), 0.0001)
-  const w = 100 / data.length
+  const chartData = data?.length ? data : DEMO_CHART_DATA.map((d) => ({ [x]: d.label, [y]: d.value }))
+  const max = Math.max(...chartData.map((d: any) => Number(d[y]) || 0), 0.0001)
+  const w = 100 / chartData.length
   return (
     <div>
       <svg viewBox={`0 0 100 ${height / 3}`} preserveAspectRatio="none"
            style={{ width: '100%', height, display: 'block' }}>
-        {data.map((d: any, i: number) => {
+        {chartData.map((d: any, i: number) => {
           const h = ((Number(d[y]) || 0) / max) * (height / 3 - 2)
           return (
             <rect key={i} x={i * w + w * 0.15} y={height / 3 - h}
@@ -355,7 +356,7 @@ export function BarChart({ data, x, y, color = 'var(--accent-2)', height = 200, 
         })}
       </svg>
       <div className="row" style={{ fontSize: 10, color: 'var(--muted)', marginTop: 4 }}>
-        {data.map((d: any, i: number) => (
+        {chartData.map((d: any, i: number) => (
           <span key={i} style={{ width: `${w}%`, textAlign: 'center', overflow: 'hidden' }}>
             {String(d[x]).slice(0, 10)}
           </span>
@@ -366,8 +367,10 @@ export function BarChart({ data, x, y, color = 'var(--accent-2)', height = 200, 
 }
 
 export function LineChart({ series, height = 220 }: any) {
-  const all = series.flatMap((s: any) => s.points)
-  if (!all.length) return <div className="muted small">No data.</div>
+  const chartSeries = series?.some((s: any) => s.points?.length)
+    ? series
+    : [{ name: 'Representative trend', color: 'var(--accent-2)', points: DEMO_TREND }]
+  const all = chartSeries.flatMap((s: any) => s.points)
   const xs = all.map((p: any) => p.x)
   const ys = all.map((p: any) => p.y)
   const minX = Math.min(...xs), maxX = Math.max(...xs)
@@ -381,7 +384,7 @@ export function LineChart({ series, height = 220 }: any) {
         {[0, 25, 50, 75, 100].map((g) => (
           <line key={g} x1="0" x2="100" y1={g} y2={g} stroke="var(--line)" strokeWidth="0.3" />
         ))}
-        {series.map((s: any, i: number) => (
+        {chartSeries.map((s: any, i: number) => (
           <g key={i}>
             <polyline
               points={s.points.map((p: any) => `${px(p.x)},${py(p.y)}`).join(' ')}
@@ -398,7 +401,7 @@ export function LineChart({ series, height = 220 }: any) {
         ))}
       </svg>
       <div className="row small" style={{ marginTop: 6 }}>
-        {series.map((s: any, i: number) => (
+        {chartSeries.map((s: any, i: number) => (
           <span key={i} className="muted">
             <span style={{ display: 'inline-block', width: 10, height: 3,
                            background: s.color, marginRight: 5, verticalAlign: 'middle' }} />
@@ -413,14 +416,19 @@ export function LineChart({ series, height = 220 }: any) {
 }
 
 export function Donut({ items, size = 150 }: any) {
-  const total = items.reduce((s: number, i: any) => s + (i.value || 0), 0) || 1
+  const donutItems = items?.length ? items : [
+    { label: 'Direct emissions', value: 35, color: 'var(--s1)' },
+    { label: 'Purchased energy', value: 25, color: 'var(--s2)' },
+    { label: 'Value chain', value: 40, color: 'var(--s3)' },
+  ]
+  const total = donutItems.reduce((s: number, i: any) => s + (i.value || 0), 0) || 1
   let acc = 0
   const r = 15.9155
   return (
     <div className="row" style={{ gap: 16 }}>
       <svg width={size} height={size} viewBox="0 0 42 42">
         <circle cx="21" cy="21" r={r} fill="none" stroke="var(--panel-2)" strokeWidth="5" />
-        {items.map((it: any, i: number) => {
+        {donutItems.map((it: any, i: number) => {
           const pct = ((it.value || 0) / total) * 100
           const el = <circle key={i} cx="21" cy="21" r={r} fill="none" stroke={it.color}
             strokeWidth="5" strokeDasharray={`${pct} ${100 - pct}`}
