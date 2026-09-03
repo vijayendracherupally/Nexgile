@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout'
 import Overview from './pages/Overview'
 import { Login, Signup } from './pages/Auth'
@@ -25,7 +25,16 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="*" element={<Layout><Routes>
+        <Route path="*" element={<ProtectedLayout />} />
+      </Routes>
+    </BrowserRouter>
+  )
+}
+
+function ProtectedLayout() {
+  const authenticated = localStorage.getItem('decarbx.authenticated')
+  if (authenticated === 'false') return <Navigate to="/login" replace />
+  return <Layout><Routes>
           <Route path="/" element={<Overview />} />
           <Route path="/organization" element={<Organization />} />
           <Route path="/accounting/scope/:scope" element={<ScopePage />} />
@@ -53,10 +62,7 @@ function App() {
           <Route path="/platform/bulk" element={<BulkOps />} />
           <Route path="/platform/access" element={<Access />} />
           <Route path="*" element={<Overview />} />
-        </Routes></Layout>} />
-      </Routes>
-    </BrowserRouter>
-  )
+  </Routes></Layout>
 }
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

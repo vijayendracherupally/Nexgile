@@ -162,6 +162,7 @@ pre { background: var(--panel-2); padding: 10px; border-radius: 6px;
   .searchform { flex-basis: 100%; max-width: none; order: -1; }
   .saved-views { flex: 1; }
   .topbar select { min-width: 0; flex: 1; }
+  .topbar .btn { flex: 0 0 auto; }
   .auth-page { display: block; }
   .auth-aside { min-height: 270px; padding: 28px 22px; }
   .auth-aside h1 { font-size: 32px; }

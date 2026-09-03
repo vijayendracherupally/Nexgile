@@ -173,6 +173,10 @@ export default function Layout({ children }: any) {
               </option>
             ))}
           </select>
+          <button className="btn sm" type="button" onClick={() => {
+            localStorage.setItem('decarbx.authenticated', 'false')
+            nav('/login')
+          }}>Log out</button>
         </div>
 
         {scenarioId != null && (
