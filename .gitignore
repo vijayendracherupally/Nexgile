@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Runtime data and uploads
+backend/data/*.db
+uploads/
+
+# Frontend build dependencies and output
+frontend/node_modules/
+frontend/dist/
+*.tsbuildinfo
+
+# Local configuration and editor files
+.env
+.env.*
+!.env.example
+.vscode/
+.idea/
