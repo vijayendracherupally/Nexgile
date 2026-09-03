@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout'
 import Overview from './pages/Overview'
+import { Login, Signup } from './pages/Auth'
 import {
   ActivityData, Calculations, Factors, Governance, Organization, ScopePage,
 } from './pages/Accounting'
@@ -21,8 +22,10 @@ import './styles.css'
 function App() {
   return (
     <BrowserRouter>
-      <Layout>
-        <Routes>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="*" element={<Layout><Routes>
           <Route path="/" element={<Overview />} />
           <Route path="/organization" element={<Organization />} />
           <Route path="/accounting/scope/:scope" element={<ScopePage />} />
@@ -50,8 +53,8 @@ function App() {
           <Route path="/platform/bulk" element={<BulkOps />} />
           <Route path="/platform/access" element={<Access />} />
           <Route path="*" element={<Overview />} />
-        </Routes>
-      </Layout>
+        </Routes></Layout>} />
+      </Routes>
     </BrowserRouter>
   )
 }
