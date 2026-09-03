@@ -45,7 +45,8 @@ export default function Overview() {
                 <LineChart series={[
                   { name: 'Actual', color: 'var(--accent-2)',
                     points: d.trajectory.map((p: any) => ({ x: p.year, y: p.tco2e })) },
-                  ...(d.targets[0]?.computed_trajectory ? [] : []),
+                  ...(d.targets[0]?.computed_trajectory ? [{ name: 'Target pathway', color: 'var(--accent)', dashed: true,
+                    points: d.targets[0].computed_trajectory.map((p: any) => ({ x: p.year, y: p.tco2e })) }] : []),
                 ]} />
               </Card>
             </div>

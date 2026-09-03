@@ -30,6 +30,10 @@ export const DEMO_SCORECARD = {
     base_value: 231400, target_year: 2030, reduction_pct: 42,
     allowed_this_year_tco2e: 191500, actual_tco2e: 184260,
     variance_tco2e: -7240, on_track: true,
+    computed_trajectory: [
+      { year: 2022, tco2e: 231400 }, { year: 2023, tco2e: 218600 },
+      { year: 2024, tco2e: 205300 }, { year: 2025, tco2e: 191500 },
+    ],
   }],
   peer_benchmarks: [
     { metric: 'Scope 1 + 2 intensity', peer_best: 26.8, peer_median: 48.2, our_value: 36.1, vs_median_pct: -25.1 },
@@ -78,6 +82,18 @@ const SAMPLE_ROWS = [
     scope: 'scope_3', status: 'calculated', year: 2025, tco2e: 9650, tco2e_tonnes: 9650,
     co2e_tonnes: 9650, value: 9650, share_pct: 5.2, confidence_score: 76,
     data_quality_rating: 'medium', description: 'Purchased goods and services', quantity: 142000, unit: 'EUR', facilities: [] },
+  { id: 4, name: 'Cleveland Works', entity_name: 'Meridian Americas Inc.', country: 'US',
+    scope: 'scope_1', status: 'approved', year: 2025, tco2e: 7840, tco2e_tonnes: 7840,
+    co2e_tonnes: 7840, value: 7840, share_pct: 4.3, confidence_score: 91,
+    data_quality_rating: 'high', description: 'Fleet fuel and process emissions', quantity: 118000, unit: 'litre', facilities: [] },
+  { id: 5, name: 'Singapore Hub', entity_name: 'Meridian Asia Pte Ltd', country: 'SG',
+    scope: 'scope_2', status: 'approved', year: 2025, tco2e: 6320, tco2e_tonnes: 6320,
+    co2e_tonnes: 6320, value: 6320, share_pct: 3.4, confidence_score: 84,
+    data_quality_rating: 'medium', description: 'Purchased renewable electricity', quantity: 97000, unit: 'kWh', facilities: [] },
+  { id: 6, name: 'Nordwind Metals', entity_name: 'Meridian Industrial Group', country: 'SE',
+    scope: 'scope_3', status: 'in_review', year: 2025, tco2e: 5210, tco2e_tonnes: 5210,
+    co2e_tonnes: 5210, value: 5210, share_pct: 2.8, confidence_score: 69,
+    data_quality_rating: 'low', description: 'Supplier-specific material footprint', quantity: 89000, unit: 'kg', facilities: [] },
 ]
 
 const SAMPLE_LIST = SAMPLE_ROWS.map((row) => ({ ...row }))
