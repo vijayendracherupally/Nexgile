@@ -1,13 +1,22 @@
 import React from 'react'
 import { fmt, useApi } from '../lib/api'
+import { DEMO_SCORECARD } from '../lib/demo'
 import { Card, Data, Donut, KPI, LineChart, Page, Table, Bar, StatusBadge } from '../components/ui'
 
 export default function Overview() {
   const q = useApi('/dashboards/scorecard/executive?year=2025')
+  const isDemo = !q.loading && !q.data
+  const display = isDemo ? { ...q, data: DEMO_SCORECARD, error: null } : q
   return (
     <Page title="Executive scorecard" req="FR-3.E.1"
           sub="Total emissions, intensity, targets, trajectories, peer benchmarks, exposure, risks and reduction performance.">
-      <Data of={q}>{(d: any) => {
+      {isDemo && (
+        <div className="demo-banner">
+          <span className="demo-pulse" />
+          <span><b>Interactive demo data</b> · Showing a representative executive scorecard while the live API wakes up.</span>
+        </div>
+      )}
+      <Data of={display}>{(d: any) => {
         const t = d.total_emissions
         const scopeColors: any = { scope_1: 'var(--s1)', scope_2: 'var(--s2)', scope_3: 'var(--s3)' }
         return (

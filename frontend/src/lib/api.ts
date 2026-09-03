@@ -33,7 +33,9 @@ function url(path: string) {
   if (SESSION.scenarioId != null && !u.searchParams.has('scenario_id')) {
     u.searchParams.set('scenario_id', String(SESSION.scenarioId))
   }
-  return u.pathname + u.search
+  // Keep same-origin URLs relative for Vite's local proxy, but preserve the
+  // absolute origin when Vercel is configured to call the Render API.
+  return API_ORIGIN ? u.toString() : u.pathname + u.search
 }
 
 export async function api<T = any>(path: string, init?: RequestInit): Promise<T> {
