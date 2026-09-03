@@ -50,6 +50,9 @@ export async function api<T = any>(path: string, init?: RequestInit): Promise<T>
       },
     })
     if (!res.ok) {
+      if (res.status === 404 && (init?.method || 'GET').toUpperCase() === 'GET') {
+        return demoResponse(path) as T
+      }
       let detail: any = res.statusText
       try { detail = (await res.json()).detail ?? detail } catch { /* keep statusText */ }
       throw new Error(typeof detail === 'string' ? detail : JSON.stringify(detail))
