@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { SESSION, api, post, setScenario, setUser, useApi } from '../lib/api'
 
 const NAV = [
@@ -45,12 +45,16 @@ const NAV = [
   ]],
 ]
 
+const DEFAULT_COLLAPSED = Object.fromEntries(NAV.slice(1).map(([group]) => [group, true]))
+
 export default function Layout({ children }: any) {
   const nav = useNavigate()
+  const location = useLocation()
   const [users, setUsers] = useState<any[]>([])
   const [scenarios, setScenarios] = useState<any[]>([])
   const [scenarioId, setScenarioIdState] = useState<number | null>(SESSION.scenarioId)
   const [actingAs, setActingAs] = useState(SESSION.email)
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>(DEFAULT_COLLAPSED)
   const [q, setQ] = useState('')
   const [results, setResults] = useState<any>(null)
   const [savedMessage, setSavedMessage] = useState('')
@@ -65,6 +69,12 @@ export default function Layout({ children }: any) {
   }
   const canSeeGroup = (group: string) => group === 'Overview' || !me.data || me.data.is_unrestricted ||
     (me.data.permissions || []).includes(groupPermissions[group])
+
+  useEffect(() => {
+    const activeGroup = NAV.find(([, links]: any) => links.some(([to]: any) =>
+      to === location.pathname || (to !== '/' && location.pathname.startsWith(to))))?.[0] as string | undefined
+    if (activeGroup) setCollapsed((current) => ({ ...current, [activeGroup]: false }))
+  }, [location.pathname])
 
   useEffect(() => {
     api('/platform/users').then(setUsers).catch(() => {})
@@ -92,10 +102,15 @@ export default function Layout({ children }: any) {
           <h1>Nexgile · DecarbX</h1>
           <span>Environmental Intelligence Platform</span>
         </div>
+        <div className="sidebar-nav">
         {NAV.filter(([group]: any) => canSeeGroup(group)).map(([group, links]: any) => (
           <div key={group}>
-            <div className="navgroup">{group}</div>
-            {links.map(([to, label]: any) => (
+            {group === 'Overview' ? <div className="navgroup navgroup-static">{group}</div> : <button
+              className="navgroup navgroup-toggle" type="button" aria-expanded={!collapsed[group]}
+              onClick={() => setCollapsed((current) => ({ ...current, [group]: !current[group] }))}>
+              <span>{group}</span><span className="nav-chevron">{collapsed[group] ? '+' : '−'}</span>
+            </button>}
+            {!collapsed[group] && links.map(([to, label]: any) => (
               <NavLink key={to} to={to} end={to === '/'}
                        className={({ isActive }) => `navlink ${isActive ? 'active' : ''}`}>
                 {label}
@@ -103,6 +118,7 @@ export default function Layout({ children }: any) {
             ))}
           </div>
         ))}
+        </div>
       </aside>
 
       <div className="main">
