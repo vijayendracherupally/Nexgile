@@ -1,5 +1,6 @@
 // One API client. Carries the acting user (FR-7.1) and the scenario context (FR-7.8).
 import { useEffect, useState } from 'react'
+import { demoResponse } from './demo'
 
 export const SESSION = {
   email: localStorage.getItem('decarbx.email') || 'ana.k@meridian.example',
@@ -39,21 +40,26 @@ function url(path: string) {
 }
 
 export async function api<T = any>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(url(path), {
-    ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      'X-User-Email': SESSION.email,
-      ...(init?.headers || {}),
-    },
-  })
-  if (!res.ok) {
-    let detail: any = res.statusText
-    try { detail = (await res.json()).detail ?? detail } catch { /* keep statusText */ }
-    throw new Error(typeof detail === 'string' ? detail : JSON.stringify(detail))
+  try {
+    const res = await fetch(url(path), {
+      ...init,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Email': SESSION.email,
+        ...(init?.headers || {}),
+      },
+    })
+    if (!res.ok) {
+      let detail: any = res.statusText
+      try { detail = (await res.json()).detail ?? detail } catch { /* keep statusText */ }
+      throw new Error(typeof detail === 'string' ? detail : JSON.stringify(detail))
+    }
+    const text = await res.text()
+    return text ? JSON.parse(text) : (null as any)
+  } catch (error) {
+    if ((init?.method || 'GET').toUpperCase() !== 'GET') throw error
+    return demoResponse(path) as T
   }
-  const text = await res.text()
-  return text ? JSON.parse(text) : (null as any)
 }
 
 export const post = <T = any>(p: string, body?: any) =>
