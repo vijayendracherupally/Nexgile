@@ -7,6 +7,10 @@ export const SESSION = {
 }
 
 const listeners = new Set<() => void>()
+// In production the React app is served by Vercel while the FastAPI service
+// runs on Render. Leave this unset for local development, where Vite proxies
+// /api to the local backend.
+const API_ORIGIN = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '')
 export function onSessionChange(fn: () => void) {
   listeners.add(fn)
   // React effect cleanups must return void (not Set.delete's boolean result).
@@ -25,7 +29,7 @@ export function setScenario(id: number | null) {
 }
 
 function url(path: string) {
-  const u = new URL(`/api${path}`, window.location.origin)
+  const u = new URL(`/api${path}`, API_ORIGIN || window.location.origin)
   if (SESSION.scenarioId != null && !u.searchParams.has('scenario_id')) {
     u.searchParams.set('scenario_id', String(SESSION.scenarioId))
   }
