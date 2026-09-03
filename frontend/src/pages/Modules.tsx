@@ -94,6 +94,7 @@ export function PCFPage() {
   const iso = useApi(open ? `/lca/pcf/${open}/iso14067-report` : null, [open])
   const pack = useApi(open ? `/lca/pcf/${open}/certification-pack` : null, [open])
   const [exchange, setExchange] = useState<any>(null)
+  const [reviewMessage, setReviewMessage] = useState('')
   return (
     <Page title="Product carbon footprints" req="FR-3.B.3 / FR-3.B.4"
           sub="Cradle-to-gate, gate-to-gate and cradle-to-grave boundaries with functional units, allocation, circularity, uncertainty, peer review, verification and certification packs.">
@@ -185,11 +186,21 @@ export function PCFPage() {
             </Card>
             <Card title="Certification pack" note="FR-3.B.4">
               <Data of={pack}>{(p: any) => (
-                <div className="row">
+                <div className="stack">
+                  <div className="row">
                   <span className="badge info">{p.pack_id}</span>
                   <span className="badge">{p.evidence_count} evidence documents</span>
                   <span className="badge">{(p.assumptions || []).length} assumptions</span>
                   <span className="badge warn">uncertainty {fmt.pct(p.uncertainty_pct)}</span>
+                  </div>
+                  <div className="row">
+                    {['peer_review', 'verify', 'certify'].map((action) => (
+                      <ActionButton key={action} label={fmt.label(action)}
+                        run={() => post(`/lca/pcf/${open}/review`, { action, reviewer: 'Ana Kowalski', certification_ref: '' })}
+                        onDone={() => { setReviewMessage(`${fmt.label(action)} recorded`); iso.reload(); pack.reload() }} />
+                    ))}
+                    {reviewMessage && <span className="small muted">{reviewMessage}</span>}
+                  </div>
                 </div>
               )}</Data>
             </Card>
@@ -281,7 +292,7 @@ export function EcoDesign() {
               <div className="row small">
                 <span className="badge">Recycled {fmt.pct(declaration.label.recycled_content_pct, 0)}</span>
                 <span className="badge">Recyclable {fmt.pct(declaration.label.recyclability_pct, 0)}</span>
-                <span className="badge info">QR: {declaration.qr_url.slice(0, 46)}…</span>
+                <a className="badge info" href={declaration.qr_url} target="_blank" rel="noreferrer">Open QR declaration</a>
               </div>
             </div>
           )}

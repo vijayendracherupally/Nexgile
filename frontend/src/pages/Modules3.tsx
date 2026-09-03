@@ -97,6 +97,9 @@ function CSRD() {
             { h: 'Completeness', num: true, cell: (r: any) => fmt.pct(r.completeness_pct) },
             { h: 'Assurance', cell: (r: any) => r.assurance_ready
                 ? <span className="badge ok">ready</span> : <span className="badge warn">not ready</span> },
+            { h: '', cell: (r: any) => <ActionButton label="Approve"
+              run={() => post(`/compliance/disclosures/${r.id}/approve`, { comment: 'Approved in review workflow' })}
+              onDone={() => disclosures.reload()} /> },
           ]} rows={d.items} />
         )}</Data>
       </Card>
@@ -470,6 +473,7 @@ export function Integrations() {
   const versions = useApi('/integrations/factor-libraries/versions')
   const [logs, setLogs] = useState<any>(null)
   const [importResult, setImportResult] = useState<any>(null)
+  const [dryRun, setDryRun] = useState(true)
   return (
     <Page title="Integrations & data sources" req="FR-5.1 – FR-5.5"
           sub="Enterprise systems, operational sources and external data; REST/GraphQL, webhooks, batch/streaming, JSON/XML/CSV, PACT and TfS exchange, schema mapping, import validation and error queues.">
@@ -551,15 +555,16 @@ export function Integrations() {
         )}
 
         <Card title="Imports — validation & error queue" note="FR-5.4 / FR-7.7"
-              right={<ActionButton label="Run a validating import (dry run)"
+              right={<div className="row"><label className="check"><input type="checkbox" checked={dryRun}
+                onChange={(e) => setDryRun(e.target.checked)} /> Dry run</label><ActionButton label={dryRun ? 'Validate import' : 'Execute import'}
                 run={() => post('/integrations/imports', {
-                  organization_id: 1, import_type: 'supplier', format: 'csv', dry_run: true,
+                  organization_id: 1, import_type: 'supplier', format: 'csv', dry_run: dryRun,
                   filename: 'suppliers-demo.csv',
                   payload: 'organization_id,name,code,tier,category,country,annual_spend\n' +
                     '1,Demo Supplier A,SUP-900,1,Metals,DE,1200000\n' +
                     '1,,SUP-901,1,Metals,FR,900000\n' +
                     '1,Demo Supplier C,SUP-902,notanumber,Polymers,PL,450000\n',
-                })} onDone={(r: any) => { setImportResult(r); imports.reload() }} />}>
+                })} onDone={(r: any) => { setImportResult(r); imports.reload() }} /></div>}>
           {importResult && (
             <div className="row" style={{ marginBottom: 10 }}>
               <StatusBadge status={importResult.status} />
