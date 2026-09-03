@@ -68,16 +68,16 @@ const SAMPLE_ROWS = [
   { id: 1, name: 'Stuttgart Plant', entity_name: 'Meridian Manufacturing GmbH', country: 'DE',
     scope: 'scope_1', status: 'approved', year: 2025, tco2e: 18420, tco2e_tonnes: 18420,
     co2e_tonnes: 18420, value: 18420, share_pct: 10.0, confidence_score: 88,
-    data_quality_rating: 'high', description: 'Natural gas combustion and process energy',
+    data_quality_rating: 'high', description: 'Natural gas combustion and process energy', facilities: [],
     category: 'Stationary combustion', quantity: 285000, unit: 'kWh' },
   { id: 2, name: 'Lyon Assembly', entity_name: 'Meridian Components SAS', country: 'FR',
     scope: 'scope_2', status: 'in_progress', year: 2025, tco2e: 12780, tco2e_tonnes: 12780,
     co2e_tonnes: 12780, value: 12780, share_pct: 6.9, confidence_score: 81,
-    data_quality_rating: 'medium', description: 'Purchased electricity', quantity: 196000, unit: 'kWh' },
+    data_quality_rating: 'medium', description: 'Purchased electricity', quantity: 196000, unit: 'kWh', facilities: [] },
   { id: 3, name: 'Wroclaw Foundry', entity_name: 'Meridian Polska Sp. z o.o.', country: 'PL',
     scope: 'scope_3', status: 'calculated', year: 2025, tco2e: 9650, tco2e_tonnes: 9650,
     co2e_tonnes: 9650, value: 9650, share_pct: 5.2, confidence_score: 76,
-    data_quality_rating: 'medium', description: 'Purchased goods and services', quantity: 142000, unit: 'EUR' },
+    data_quality_rating: 'medium', description: 'Purchased goods and services', quantity: 142000, unit: 'EUR', facilities: [] },
 ]
 
 const SAMPLE_LIST = SAMPLE_ROWS.map((row) => ({ ...row }))
@@ -132,6 +132,8 @@ export function demoResponse(path: string): any {
     categories: Array.from({ length: 15 }, (_, i) => ({ ...SAMPLE_ROWS[i % 3], number: i + 1,
       name: `Scope 3 category ${i + 1}`, is_reported: true, methods_used: ['activity_based'] })) }
   if (clean.includes('/grid-factors/countries')) return { country_count: 150, countries: SAMPLE_LIST }
+  if (clean.includes('/suppliers/languages')) return { count: 25,
+    languages: ['English', 'German', 'French', 'Spanish', 'Polish', 'Italian', 'Japanese'] }
   if (clean.includes('/compliance/readiness')) return { frameworks: SAMPLE_LIST }
   if (clean.includes('/double-materiality')) return { ...SAMPLE_REPORT, matrix: SAMPLE_LIST }
   if (clean.includes('/value-chain')) return { upstream_tco2e: 84200, own_operations_tco2e: 69460,
@@ -154,12 +156,18 @@ export function demoResponse(path: string): any {
       clean.includes('/cbam/declarations') || clean.includes('/assurance-requests') ||
       clean.includes('/approvals') || clean.includes('/connectors') ||
       clean.includes('/users') || clean.includes('/reports')) return SAMPLE_LIST
-  if (clean.includes('/catalog')) return { categories: SAMPLE_LIST, protocols: ['SFTP', 'API', 'CSV'],
+  if (clean.includes('/catalog')) return { categories: { ERP: ['SAP S/4HANA', 'Oracle Fusion'],
+      Utilities: ['GridWatch', 'EnergyCloud'], Procurement: ['Coupa', 'Ariba'] }, protocols: ['SFTP', 'API', 'CSV'],
     data_formats: ['CSV', 'JSON', 'XLSX'], pcf_exchange_formats: ['PACT', 'TfS'], import_types: SAMPLE_LIST }
   if (clean.includes('/sync-status')) return { connector_count: 4, healthy_count: 3, degraded_count: 1,
     by_status: SAMPLE_LIST, connectors: SAMPLE_LIST }
-  if (clean.includes('/access-check')) return { principal: 'ana.k@meridian.example', visibility: SAMPLE_REPORT.visibility,
-    enforced_by: ['tenant scope', 'role permissions'] }
+  if (clean.includes('/access-check')) return { principal: { full_name: 'Ana Kowalski',
+      role_name: 'Chief Sustainability Officer', role_group: 'sustainability', is_unrestricted: true,
+      permissions: ['accounting.read', 'analytics.read', 'compliance.read'] },
+    visibility: { entities: { visible: 6, total: 6, restricted: false },
+      facilities: { visible: 7, total: 7, restricted: false },
+      suppliers: { visible: 42, total: 48, restricted: true } },
+    enforced_by: 'tenant scope and role permissions' }
   if (clean.includes('/bulk/operations')) return { operations: ['export', 'recalculate', 'validate'],
     export_formats: ['CSV', 'JSON', 'XLSX'], note: 'Demo operations are ready.' }
   if (clean.includes('/coverage')) return { 'FR-3.A.1': 'covered', 'FR-3.D.3': 'covered', 'FR-7.4': 'covered' }
