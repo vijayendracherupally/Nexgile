@@ -135,11 +135,23 @@ export function demoResponse(path: string): any {
   if (clean.includes('/grid-factors/countries')) return { country_count: 150, countries: SAMPLE_LIST }
   if (clean.includes('/suppliers/languages')) return { count: 25,
     languages: ['English', 'German', 'French', 'Spanish', 'Polish', 'Italian', 'Japanese'] }
+  if (clean.includes('/campaigns/list')) return SAMPLE_LIST.map((row) => ({ ...row,
+    progress: { invited: 24, responded: 18, response_rate_pct: 75, reminders_sent: 6,
+      languages_used: ['English', 'German', 'French'] } }))
+  if (clean.includes('/network/map')) return { supplier_count: 42, total_tco2e: 84200,
+    tiers: [{ tier: 1, supplier_count: 18, tco2e: 52400 }, { tier: 2, supplier_count: 24, tco2e: 31800 }],
+    nodes: SAMPLE_LIST.map((row) => ({ ...row, latitude: 48.8, longitude: 9.2 })),
+    edges: [{ source: 1, target: 2, tier_step: 1 }], countries: SAMPLE_LIST,
+    geographic_heatmap: SAMPLE_LIST, category_hotspots: SAMPLE_LIST,
+    supplier_hotspots: SAMPLE_LIST, outliers: SAMPLE_LIST }
   if (clean.includes('/compliance/readiness')) return { frameworks: SAMPLE_LIST }
   if (clean.includes('/double-materiality')) return { ...SAMPLE_REPORT, matrix: SAMPLE_LIST }
   if (clean.includes('/value-chain')) return { upstream_tco2e: 84200, own_operations_tco2e: 69460,
     downstream_tco2e: 30600, supplier_coverage_pct: 74 }
   if (clean.includes('/transition-plan')) return { entity_id: 1, plans: SAMPLE_LIST }
+  if (clean.includes('/pathways/sbti')) return { ambition: '1.5°C aligned', annual_linear_reduction_pct: 6.2,
+    required_reduction_by_2030_pct: 42, pathway: DEMO_TREND.map((point, index) => ({ year: point.x,
+      allowed_tco2e: point.y, actual_tco2e: index === 3 ? point.y : null })) }
   if (clean.includes('/taxonomy/kpis')) return { kpis: { revenue: 420000000, capex: 6850000, opex: 9200000 },
     activities: SAMPLE_LIST, dnsh_objectives: SAMPLE_LIST }
   if (clean.includes('/sec/disclosure')) return { scope_disclosures: SAMPLE_LIST,
@@ -179,7 +191,18 @@ export function demoResponse(path: string): any {
   if (clean.includes('/bulk/operations')) return { operations: ['export', 'recalculate', 'validate'],
     export_formats: ['CSV', 'JSON', 'XLSX'], note: 'Demo operations are ready.' }
   if (clean.includes('/coverage')) return { 'FR-3.A.1': 'covered', 'FR-3.D.3': 'covered', 'FR-7.4': 'covered' }
-  if (clean.includes('/scenario')) return SAMPLE_LIST
+  if (clean.includes('/analytics/scenarios/1')) return { ...SAMPLE_REPORT, id: 1, name: 'Supplier renewable energy plan',
+    results: { baseline_tco2e: 184260, baseline_year: 2025, final_projected_tco2e: 142800,
+      horizon_year: 2030, total_reduction_pct: 22.5, total_capex: 4200000, cost_per_tonne_abated: 101,
+      sbti: { gap_to_pathway_tco2e: -1200, on_track: true, pathway: [] }, trajectory: DEMO_TREND.map((point) => ({
+        year: point.x, business_as_usual_tco2e: point.y, projected_tco2e: point.y - 4000 })) },
+    uncertainty: { monte_carlo: { p5: 132000, p50: 142800, p95: 155000, std_dev: 5600, iterations: 10000,
+      histogram: SAMPLE_LIST.map((row, index) => ({ bin_start: index * 10000, count: 10 + index })) }, sensitivity: SAMPLE_LIST },
+    assumptions_used: { renewable_electricity_pct: 90 }, levers_applied: SAMPLE_LIST }
+  if (clean.includes('/pathways/sbti')) return SAMPLE_REPORT
+  if (clean.includes('/analytics/scenarios')) return SAMPLE_LIST
+  if (clean.includes('/analytics/gaps')) return SAMPLE_LIST
+  if (clean.includes('/dashboards/carbon-budgets') || clean.includes('/dashboards/internal-pricing')) return SAMPLE_LIST
   if (clean.includes('/activity-data') || clean.includes('/calculations') || clean.includes('/emission-factors') ||
       clean === '/lca/products' || clean === '/lca/pcf' || clean === '/suppliers' ||
       clean.includes('/data-quality/assessments') || clean.includes('/anomalies') || clean.includes('/credits') ||
