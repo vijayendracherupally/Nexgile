@@ -60,7 +60,8 @@ export async function api<T = any>(path: string, init?: RequestInit): Promise<T>
     const text = await res.text()
     return text ? JSON.parse(text) : (null as any)
   } catch (error) {
-    if ((init?.method || 'GET').toUpperCase() === 'GET' && error instanceof TypeError) {
+    if ((init?.method || 'GET').toUpperCase() === 'GET' &&
+      (error instanceof TypeError || error instanceof SyntaxError)) {
       return demoResponse(path) as T
     }
     throw error
