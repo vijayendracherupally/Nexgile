@@ -147,6 +147,11 @@ export function demoResponse(path: string): any {
     peer_benchmarks: SAMPLE_LIST, review_workflow: SAMPLE_LIST }
   if (clean.includes('/platform/roles')) return { groups: SAMPLE_LIST,
     permissions: ['accounting.read', 'analytics.read', 'compliance.read'], roles: SAMPLE_LIST }
+  if (clean.includes('/platform/users')) return [
+    { id: 1, email: 'ana.k@meridian.example', full_name: 'Ana Kowalski', role_name: 'Chief Sustainability Officer', role_group: 'sustainability', language: 'English', grants: [] },
+    { id: 2, email: 'iris.d@meridian.example', full_name: 'Iris Delacroix', role_name: 'Finance', role_group: 'business', language: 'French', grants: [] },
+    { id: 3, email: 'carlos.m@meridian.example', full_name: 'Carlos Mendes', role_name: 'Supply Chain / Procurement', role_group: 'business', language: 'Spanish', grants: [] },
+  ]
   if (clean.includes('/bom')) return { bom: { id: 1, name: 'Drive unit assembly' }, items: SAMPLE_LIST,
     flat: SAMPLE_LIST, levels: 2, total_mass_kg: 184.5 }
   if (clean.includes('/processes') || clean.includes('/routes') || clean.includes('/languages') ||

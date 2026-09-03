@@ -50,6 +50,7 @@ export default function Layout({ children }: any) {
   const [users, setUsers] = useState<any[]>([])
   const [scenarios, setScenarios] = useState<any[]>([])
   const [scenarioId, setScenarioIdState] = useState<number | null>(SESSION.scenarioId)
+  const [actingAs, setActingAs] = useState(SESSION.email)
   const [q, setQ] = useState('')
   const [results, setResults] = useState<any>(null)
   const me = useApi<any>('/platform/me')
@@ -87,9 +88,9 @@ export default function Layout({ children }: any) {
 
       <div className="main">
         <div className="topbar">
-          <form onSubmit={runSearch} style={{ position: 'relative' }}>
+          <form className="searchform" onSubmit={runSearch}>
             <input placeholder="Search everything…  (FR-7.5)" value={q}
-                   onChange={(e) => setQ(e.target.value)} style={{ width: 300 }} />
+                   onChange={(e) => setQ(e.target.value)} />
             {results && (
               <div className="card" style={{ position: 'absolute', top: 36, left: 0,
                                              width: 460, zIndex: 50, maxHeight: 400,
@@ -119,8 +120,8 @@ export default function Layout({ children }: any) {
 
           <div className="spacer" />
 
-          <label className="small muted">Scenario</label>
-          <select value={scenarioId ?? ''} onChange={(e) => {
+          <label className="topbar-label" htmlFor="scenario-select">Scenario</label>
+          <select id="scenario-select" value={scenarioId ?? ''} onChange={(e) => {
             const v = e.target.value ? Number(e.target.value) : null
             setScenarioIdState(v); setScenario(v)
           }}>
@@ -130,8 +131,11 @@ export default function Layout({ children }: any) {
             ))}
           </select>
 
-          <label className="small muted">Acting as</label>
-          <select value={SESSION.email} onChange={(e) => setUser(e.target.value)}>
+          <label className="topbar-label" htmlFor="acting-as-select">Acting as</label>
+          <select id="acting-as-select" value={actingAs} onChange={(e) => {
+            setActingAs(e.target.value)
+            setUser(e.target.value)
+          }}>
             {users.map((u) => (
               <option key={u.email} value={u.email}>
                 {u.full_name} — {u.role_name}

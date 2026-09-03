@@ -36,6 +36,9 @@ button { font: inherit; cursor: pointer; }
   border-bottom: 1px solid var(--line); background: var(--panel);
   position: sticky; top: 0; z-index: 20;
 }
+.searchform { position: relative; flex: 1; max-width: 420px; }
+.searchform input { width: 100%; }
+.topbar-label { color: var(--muted); font-size: 11px; white-space: nowrap; }
 .content { padding: 20px; min-width: 0; }
 .page-title { font-size: 20px; margin: 0 0 2px; }
 .page-sub { color: var(--muted); font-size: 13px; margin: 0 0 18px; }
@@ -120,3 +123,19 @@ pre { background: var(--panel-2); padding: 10px; border-radius: 6px;
 .demo-empty { padding: 10px 0; color: var(--muted); font-size: 12px; }
 .demo-pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-2);
   box-shadow: 0 0 0 4px rgba(88,166,255,.16); flex: 0 0 auto; }
+
+@media (max-width: 900px) {
+  .app { grid-template-columns: 190px 1fr; }
+  .topbar { padding: 9px 14px; gap: 8px; }
+  .topbar-label { display: none; }
+  .content { padding: 14px; }
+}
+
+@media (max-width: 640px) {
+  .app { display: block; }
+  .sidebar { position: static; width: 100%; height: auto; max-height: 180px; }
+  .brand { padding-bottom: 10px; }
+  .topbar { flex-wrap: wrap; }
+  .searchform { flex-basis: 100%; max-width: none; order: -1; }
+  .topbar select { min-width: 0; flex: 1; }
+}
