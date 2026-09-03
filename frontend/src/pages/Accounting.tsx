@@ -189,6 +189,7 @@ export function ScopePage() {
 export function ActivityData() {
   const [scope, setScope] = useState('')
   const [page, setPage] = useState(1)
+  const [capture, setCapture] = useState(false)
   const q = useApi(`/accounting/activity-data?page=${page}&page_size=25${scope ? `&scope=${scope}` : ''}`,
                    [scope, page])
   const [lineage, setLineage] = useState<number | null>(null)
@@ -197,6 +198,9 @@ export function ActivityData() {
           sub="The raw quantities everything is computed from, each carrying its origin and data-quality state."
           actions={
             <div className="row">
+              <button className="btn sm primary" onClick={() => setCapture((v) => !v)}>
+                {capture ? 'Close capture' : 'Add activity data'}
+              </button>
               {['', 'scope_1', 'scope_2', 'scope_3'].map((s) => (
                 <span key={s} className={`chip ${scope === s ? 'on' : ''}`}
                       onClick={() => { setScope(s); setPage(1) }}>
@@ -204,6 +208,7 @@ export function ActivityData() {
                 </span>
               ))}
             </div>}>
+          {capture && <ActivityCapture onDone={() => { setCapture(false); q.reload() }} />}
       <Data of={q}>{(d: any) => (
         <Card title={`${fmt.n(d.total)} rows`} right={
           <div className="row">
@@ -233,6 +238,34 @@ export function ActivityData() {
       {lineage && <LineageDrawer calculationId={lineage} onClose={() => setLineage(null)} />}
     </Page>
   )
+}
+
+function ActivityCapture({ onDone }: { onDone: () => void }) {
+  const [form, setForm] = useState({ entity_id: 2, scope: 'scope_1', activity_key: 'natural_gas',
+    description: 'Natural gas used at Stuttgart Plant', quantity: 285000, unit: 'kWh',
+    period_start: '2025-01-01', period_end: '2025-12-31', data_origin: 'meter' })
+  const [saving, setSaving] = useState(false)
+  const [message, setMessage] = useState('')
+  const update = (key: string, value: string) => setForm((current) => ({ ...current, [key]: value }))
+  async function save(e: React.FormEvent) {
+    e.preventDefault(); setSaving(true); setMessage('')
+    try { await post('/accounting/activity-data', { ...form, entity_id: Number(form.entity_id), quantity: Number(form.quantity) }); onDone() }
+    catch (error: any) { setMessage(error.message) }
+    setSaving(false)
+  }
+  return <form className="card capture-form" onSubmit={save}>
+    <div className="row"><h3>Capture activity data</h3><div className="spacer" /><span className="small muted">Calculated with lineage</span></div>
+    <div className="grid g3">
+      <label className="field">Scope<select value={form.scope} onChange={(e) => update('scope', e.target.value)}><option>scope_1</option><option>scope_2</option><option>scope_3</option></select></label>
+      <label className="field">Activity key<input value={form.activity_key} onChange={(e) => update('activity_key', e.target.value)} /></label>
+      <label className="field">Quantity<input type="number" value={form.quantity} onChange={(e) => update('quantity', e.target.value)} /></label>
+      <label className="field">Unit<input value={form.unit} onChange={(e) => update('unit', e.target.value)} /></label>
+      <label className="field">Period start<input type="date" value={form.period_start} onChange={(e) => update('period_start', e.target.value)} /></label>
+      <label className="field">Period end<input type="date" value={form.period_end} onChange={(e) => update('period_end', e.target.value)} /></label>
+    </div>
+    <label className="field">Description<input value={form.description} onChange={(e) => update('description', e.target.value)} /></label>
+    <div className="row"><button className="btn sm primary" disabled={saving}>{saving ? 'Saving…' : 'Save and calculate'}</button>{message && <span className="small up">{message}</span>}</div>
+  </form>
 }
 
 export function Calculations() {

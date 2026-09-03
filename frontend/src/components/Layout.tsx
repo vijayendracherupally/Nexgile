@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { SESSION, api, setScenario, setUser, useApi } from '../lib/api'
+import { SESSION, api, post, setScenario, setUser, useApi } from '../lib/api'
 
 const NAV = [
   ['Overview', [['/', 'Executive scorecard']]],
@@ -53,7 +53,18 @@ export default function Layout({ children }: any) {
   const [actingAs, setActingAs] = useState(SESSION.email)
   const [q, setQ] = useState('')
   const [results, setResults] = useState<any>(null)
+  const [savedMessage, setSavedMessage] = useState('')
   const me = useApi<any>('/platform/me')
+  const savedViews = useApi<any[]>('/platform/saved-views')
+
+  const groupPermissions: Record<string, string> = {
+    'A · Carbon accounting': 'accounting.read', 'B · Product LCA & PCF': 'lca.read',
+    'C · Suppliers & Scope 3': 'suppliers.read', 'D · Analytics & planning': 'analytics.read',
+    'E · Dashboards & finance': 'dashboards.read', '4 · Compliance': 'compliance.read',
+    '5 · Integrations': 'integrations.read', '7 · Platform': 'platform.admin',
+  }
+  const canSeeGroup = (group: string) => group === 'Overview' || !me.data || me.data.is_unrestricted ||
+    (me.data.permissions || []).includes(groupPermissions[group])
 
   useEffect(() => {
     api('/platform/users').then(setUsers).catch(() => {})
@@ -66,6 +77,14 @@ export default function Layout({ children }: any) {
     setResults(await api(`/platform/search?q=${encodeURIComponent(q)}`))
   }
 
+  async function saveSearch() {
+    if (!q.trim()) return
+    try {
+      await post('/platform/saved-views', { name: `Search: ${q}`, object_type: 'global', filters: { q } })
+      setSavedMessage('Saved'); savedViews.reload()
+    } catch (error: any) { setSavedMessage(error.message) }
+  }
+
   return (
     <div className="app">
       <aside className="sidebar">
@@ -73,7 +92,7 @@ export default function Layout({ children }: any) {
           <h1>Nexgile · DecarbX</h1>
           <span>Environmental Intelligence Platform</span>
         </div>
-        {NAV.map(([group, links]: any) => (
+        {NAV.filter(([group]: any) => canSeeGroup(group)).map(([group, links]: any) => (
           <div key={group}>
             <div className="navgroup">{group}</div>
             {links.map(([to, label]: any) => (
@@ -117,6 +136,18 @@ export default function Layout({ children }: any) {
               </div>
             )}
           </form>
+
+          <div className="saved-views">
+            <button className="btn sm" type="button" onClick={saveSearch} disabled={!q.trim()}>Save view</button>
+            {savedViews.data?.length > 0 && <select aria-label="Saved views" value="" onChange={(e) => {
+              const view = savedViews.data.find((item: any) => String(item.id) === e.target.value)
+              if (view) setQ(view.filters?.q || '')
+            }}>
+              <option value="">Saved views</option>
+              {savedViews.data.map((view: any) => <option key={view.id} value={view.id}>{view.name}</option>)}
+            </select>}
+            {savedMessage && <span className="small muted">{savedMessage}</span>}
+          </div>
 
           <div className="spacer" />
 

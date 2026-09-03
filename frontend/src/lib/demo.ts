@@ -115,6 +115,7 @@ export function demoResponse(path: string): any {
   const clean = path.split('?')[0].replace(/\/\d+(?=\/|$)/g, '/1')
   if (clean === '/platform/me') {
     return { is_unrestricted: true, role_name: 'Chief Sustainability Officer',
+      permissions: ['*'],
       scope: { entities: [1, 2, 3], facilities: [1, 2, 3], suppliers: [1, 2, 3] } }
   }
   if (clean.includes('/scorecard/executive')) return DEMO_SCORECARD
@@ -152,6 +153,8 @@ export function demoResponse(path: string): any {
     { id: 2, email: 'iris.d@meridian.example', full_name: 'Iris Delacroix', role_name: 'Finance', role_group: 'business', language: 'French', grants: [] },
     { id: 3, email: 'carlos.m@meridian.example', full_name: 'Carlos Mendes', role_name: 'Supply Chain / Procurement', role_group: 'business', language: 'Spanish', grants: [] },
   ]
+  if (clean.includes('/saved-views')) return [{ id: 1, name: 'High-emission suppliers', object_type: 'global',
+    filters: { q: 'supplier' }, is_shared: true }]
   if (clean.includes('/bom')) return { bom: { id: 1, name: 'Drive unit assembly' }, items: SAMPLE_LIST,
     flat: SAMPLE_LIST, levels: 2, total_mass_kg: 184.5 }
   if (clean.includes('/processes') || clean.includes('/routes') || clean.includes('/languages') ||

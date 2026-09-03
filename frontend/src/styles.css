@@ -38,6 +38,7 @@ button { font: inherit; cursor: pointer; }
 }
 .searchform { position: relative; flex: 1; max-width: 420px; }
 .searchform input { width: 100%; }
+.saved-views { display: flex; align-items: center; gap: 6px; }
 .topbar-label { color: var(--muted); font-size: 11px; white-space: nowrap; }
 .content { padding: 20px; min-width: 0; }
 .page-title { font-size: 20px; margin: 0 0 2px; }
@@ -121,6 +122,7 @@ pre { background: var(--panel-2); padding: 10px; border-radius: 6px;
   padding: 9px 12px; border: 1px solid #1f4a7a; border-radius: 8px;
   color: #b9dcff; background: linear-gradient(90deg, #102d44, #132638); font-size: 12.5px; }
 .demo-empty { padding: 10px 0; color: var(--muted); font-size: 12px; }
+.capture-form { border-color: #28635b; background: linear-gradient(145deg, #17322f, var(--panel)); }
 .demo-pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-2);
   box-shadow: 0 0 0 4px rgba(88,166,255,.16); flex: 0 0 auto; }
 
@@ -137,5 +139,6 @@ pre { background: var(--panel-2); padding: 10px; border-radius: 6px;
   .brand { padding-bottom: 10px; }
   .topbar { flex-wrap: wrap; }
   .searchform { flex-basis: 100%; max-width: none; order: -1; }
+  .saved-views { flex: 1; }
   .topbar select { min-width: 0; flex: 1; }
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { api, fmt, post, useApi } from '../lib/api'
+import { api, fmt, patch, post, useApi } from '../lib/api'
 import {
   ActionButton, Bar, BarChart, Card, DQBadge, Data, Donut, GeoMap, KPI, LineChart,
   LineageDrawer, Page, StatusBadge, Table,
@@ -155,6 +155,9 @@ export function Anomalies() {
               { h: 'z', num: true, cell: (r: any) => fmt.t(r.z_score, 2) },
               { h: 'Explanation', cell: (r: any) => <span className="small muted">{r.explanation}</span> },
               { h: 'Status', cell: (r: any) => <StatusBadge status={r.status} /> },
+              { h: '', cell: (r: any) => <ActionButton label="Resolve"
+                  run={() => patch(`/analytics/anomalies/${r.id}`, { status: 'resolved' })}
+                  onDone={() => anomalies.reload()} /> },
             ]} rows={d.items} />
           )}</Data>
         </Card>
@@ -187,10 +190,16 @@ export function Scenarios() {
     <Page title="Scenarios & what-if" req="FR-3.D.2 / FR-7.8"
           sub="What-if modelling, Monte Carlo uncertainty, sensitivity analysis, internal carbon price impacts and SBTi-aligned pathway optimization — always isolated from approved actuals."
           actions={<Data of={list}>{(rows: any[]) => (
-            <ActionButton label="Compare all scenarios"
-                          run={() => post('/analytics/scenarios/compare',
-                                          { scenario_ids: rows.map((r: any) => r.id) })}
-                          onDone={setCompare} />
+            <div className="row">
+              <ActionButton label="Create demo scenario"
+                run={() => post('/analytics/scenarios', { organization_id: 1, name: 'Supplier renewable energy plan',
+                  scenario_type: 'what_if', base_year: 2025, horizon_year: 2030,
+                  assumptions: { renewable_electricity_pct: 90 }, internal_carbon_price: 90 })}
+                onDone={() => list.reload()} />
+              <ActionButton label="Compare all scenarios"
+                run={() => post('/analytics/scenarios/compare', { scenario_ids: rows.map((r: any) => r.id) })}
+                onDone={setCompare} />
+            </div>
           )}</Data>}>
       <div className="stack">
         <Card title="Scenario isolation" note="FR-7.8">
